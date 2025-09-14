@@ -62,9 +62,9 @@ const storytellingConfig = {
       image: '/1.webp',
       description: 'inDrive is revolutionizing transportation by putting passengers and drivers in control. Our platform allows you to negotiate fair prices and choose your preferred driver. <br><br><strong>Scroll down to explore our journey</strong>',
       location: {
-        center: [71.42, 51.0889],
-        zoom: 10,
-        pitch: 0,
+        center: [71.43055556, 51.12833333],
+        zoom: 15,
+        pitch: 30,
         bearing: 0
       },
       alignment: 'left',
@@ -92,7 +92,7 @@ const storytellingConfig = {
       image: '/3.webp',
       description: 'Our advanced algorithms ensure optimal matching between passengers and drivers, while maintaining transparency and fairness in pricing. Real-time tracking and secure payments make every journey safe and reliable.',
       location: {
-        center: [71.43, 51.09],
+        center: [71.40389, 51.13222],
         zoom: 16,
         pitch: 60,
         bearing: 45
@@ -107,8 +107,8 @@ const storytellingConfig = {
       image: '/4.webp',
       description: 'inDrive empowers local communities by providing economic opportunities for drivers and affordable transportation for passengers. We believe in fair pricing that benefits everyone in the ecosystem.',
       location: {
-        center: [71.41, 51.08],
-        zoom: 12,
+        center: [71.41280555555556, 51.09125],
+        zoom: 14,
         pitch: 30,
         bearing: -45
       },
@@ -122,8 +122,8 @@ const storytellingConfig = {
       image: '/1.webp',
       description: 'Operating in over 600 cities across 47 countries, inDrive has become a trusted transportation partner worldwide. Each market brings unique challenges and opportunities.',
       location: {
-        center: [71.44, 51.10],
-        zoom: 11,
+        center: [71.41583333333333, 51.08083333333333],
+        zoom: 13,
         pitch: 50,
         bearing: 90
       },
@@ -138,7 +138,7 @@ const storytellingConfig = {
       description: 'Join us as we continue to innovate and expand, creating a more connected and accessible world through smart transportation solutions. <br><br><a href="#contact" style="color: #00d4aa; font-weight: bold;">Get Started Today →</a>',
       location: {
         center: [71.42, 51.0889],
-        zoom: 8,
+        zoom: 2,
         pitch: 0,
         bearing: 0
       },
