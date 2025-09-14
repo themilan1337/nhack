@@ -59,6 +59,11 @@
         </div>
     </div>
     
+    <!-- Traffic Map Section -->
+    <div class="traffic-map-section">
+        <TrafficMap />
+    </div>
+    
     <!-- Stats Section -->
     <StatsSection />
     
@@ -67,11 +72,6 @@
         <div class="storytelling-wrapper">
             <StorytellingMap />
         </div>
-    </div>
-
-    <!-- Traffic Map Section -->
-    <div class="traffic-map-section">
-        <TrafficMap />
     </div>
 
 </template>
