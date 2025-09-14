@@ -76,7 +76,14 @@ const initializeMap = async () => {
     container: 'traffic-map',
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [71.416111, 51.088889], // 51°05'20"N 71°24'58"E converted to decimal degrees
-    zoom: 14
+    zoom: 14,
+    scrollZoom: false,
+    boxZoom: false,
+    dragPan: false,
+    dragRotate: false,
+    keyboard: false,
+    doubleClickZoom: false,
+    touchZoomRotate: false
   })
 
   // Add navigation controls
