@@ -49,7 +49,7 @@ const storytellingConfig = {
   style: 'mapbox://styles/milan1337/cmfibsuq8003s01s6cslgb9z0',
   accessToken: 'pk.eyJ1IjoibWlsYW4xMzM3IiwiYSI6ImNtZmliNGw1NjBqMHUya3F3N2ZlYmI4dGkifQ.1wSnZEu14y4snJroP8xOYA',
   showMarkers: false,
-  theme: 'dark',
+  theme: 'light',
   alignment: 'left',
   title: 'inDrive Journey',
   subtitle: 'Discover the story behind our innovative transportation platform',
@@ -419,11 +419,6 @@ onUnmounted(() => {
 .light {
   color: #444;
   background-color: rgba(250, 250, 250, 0.9);
-}
-
-.dark {
-  color: #fafafa;
-  background-color: rgba(68, 68, 68, 0.9);
 }
 
 @media (max-width: 750px) {

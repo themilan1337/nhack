@@ -21,7 +21,7 @@
             class="w-full h-full object-cover rounded-2xl"
         ></video>
         
-        <!-- Dark Overlay -->
+    
         <div class="absolute inset-4 bg-black/70 rounded-2xl pointer-events-none"></div>
         
         <!-- Logo at Top -->
