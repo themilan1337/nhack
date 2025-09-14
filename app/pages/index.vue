@@ -17,10 +17,16 @@
             class="w-full h-full object-cover rounded-2xl"
         ></video>
     </div>
+    
+    <!-- Storytelling Map Section -->
+    <div class="storytelling-section">
+        <StorytellingMap />
+    </div>
 </template>
 <script setup>
 import gsap from "gsap";
 import { onMounted } from "vue";
+import StorytellingMap from "~/components/StorytellingMap.vue";
 
 let SplitText;
 
@@ -213,3 +219,18 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.storytelling-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 10;
+}
+
+/* Ensure video section has proper z-index */
+.preloader-progress,
+.preloader-mask {
+  z-index: 1000;
+}
+</style>

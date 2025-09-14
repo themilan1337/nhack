@@ -9,6 +9,7 @@ dist
 # Node dependencies
 node-compile-cache
 node_modules
+storytelling/
 
 # Logs
 logs
