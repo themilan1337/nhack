@@ -165,7 +165,7 @@ img {
 
 .preloader-progress {
   background-color: var(--base-200);
-  z-index: 200000;
+  z-index: 999999;
   will-change: opacity;
 }
 
@@ -209,11 +209,11 @@ img {
     url("/mask.svg") center/50% no-repeat;
   mask-composite: subtract;
   will-change: transform;
-  z-index: 200001;
+  z-index: 1000000;
 }
 
 .preloader-content {
-  z-index: 200002;
+  z-index: 1000001;
 }
 
 .preloader-footer {
