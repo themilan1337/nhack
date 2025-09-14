@@ -1,33 +1,3 @@
-<template>
-    <div class="preloader-progress">
-      <div class="preloader-progress-bar"></div>
-      <div class="preloader-logo"><h1>Obsidian</h1></div>
-    </div>
-
-    <div class="preloader-mask"></div>
-
-    <div class="preloader-content">
-      <div class="preloader-footer">
-        <p>
-          Spaces unfold in light and shadow, where structure finds its quiet
-          rhythm, and time align in harmony.
-        </p>
-      </div>
-    </div>
-
-    <div class="!p-4 w-screen h-screen">
-        <video 
-            src="/assets/hero.mp4"
-            loop
-            autoplay
-            muted
-            playsinline
-            preload="auto"
-            class="w-full h-full object-cover rounded-2xl"
-        ></video>
-    </div>
-</template>
-<script setup>
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 
@@ -202,4 +172,3 @@ document.fonts.ready.then(() => {
       "<"
     );
 });
-</script>
