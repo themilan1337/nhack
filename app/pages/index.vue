@@ -1,3 +1,16 @@
+<!-- 
+
+
+.hero-video-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem;
+  z-index: 100;
+  background: #fff;
+}
+
+-->
 <template>
     <div class="preloader-progress">
       <div class="preloader-progress-bar"></div>
@@ -7,7 +20,7 @@
     <div class="preloader-mask"></div>
 
     <!-- Hero Video Section -->
-    <div class="hero-video-section">
+    <div class="relative w-full h-screen !p-4 max-h-screen min-h-screen z-[999] bg-white">
         <video 
             src="/assets/hero.mp4"
             loop
@@ -220,27 +233,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-.hero-video-section {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  padding: 1rem;
-  z-index: 100;
-  background: #000;
-}
-
-.storytelling-section {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  z-index: 10;
-}
-
-/* Ensure video section has proper z-index */
-.preloader-progress,
-.preloader-mask {
-  z-index: 1000;
-}
-</style>
