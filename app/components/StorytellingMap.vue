@@ -162,6 +162,8 @@ const config = ref({ ...storytellingConfig, ...props.customConfig })
 const map = ref(null)
 const scroller = ref(null)
 const marker = ref(null)
+const trafficData = ref(new Map())
+const trafficVisible = ref(true)
 
 // Alignment classes
 const alignments = {
@@ -201,6 +203,138 @@ const setLayerOpacity = (layer) => {
   })
 }
 
+// Load traffic data from CSV
+const loadTrafficData = async () => {
+  try {
+    const response = await fetch('/files/grid_data.csv')
+    const data = await response.text()
+    const lines = data.split('\n')
+    const features = []
+
+    // Create filled squares using exact corner coordinates from CSV
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim()
+      if (!line) continue
+
+      const [cell_id, lat_center, lng_center, lat_min, lat_max, lng_min, lng_max, point_density, avg_speed, traffic_load] = line.split(',')
+
+      if (lat_min && lat_max && lng_min && lng_max && traffic_load) {
+        const load = parseFloat(traffic_load)
+        const speed = parseFloat(avg_speed)
+        const latMin = parseFloat(lat_min)
+        const latMax = parseFloat(lat_max)
+        const lngMin = parseFloat(lng_min)
+        const lngMax = parseFloat(lng_max)
+
+        // Ultra-smooth intensity mapping for maximum color gradation
+        const intensity = Math.min(1.0, Math.max(0.0, load))
+
+        // Store traffic data
+        const centerLat = parseFloat(lat_center)
+        const centerLng = parseFloat(lng_center)
+        const [row, col] = cell_id.split('_').map(n => parseInt(n))
+
+        trafficData.value.set(cell_id, {
+          lat: centerLat,
+          lng: centerLng,
+          latMin: latMin,
+          latMax: latMax,
+          lngMin: lngMin,
+          lngMax: lngMax,
+          traffic_load: load,
+          avg_speed: speed,
+          row: row,
+          col: col,
+          weight: load + (1.0 / Math.max(speed, 1))
+        })
+
+        // Create filled polygon using corner coordinates with slight overlap
+        const overlap = 0.000005
+        const smoothLngMin = lngMin - overlap
+        const smoothLngMax = lngMax + overlap
+        const smoothLatMin = latMin - overlap
+        const smoothLatMax = latMax + overlap
+
+        features.push({
+          type: 'Feature',
+          properties: {
+            intensity: intensity,
+            traffic_load: load,
+            avg_speed: speed,
+            cell_id: cell_id,
+            point_density: parseFloat(point_density) || 0
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[
+              [smoothLngMin, smoothLatMin], // Bottom-left
+              [smoothLngMax, smoothLatMin], // Bottom-right
+              [smoothLngMax, smoothLatMax], // Top-right
+              [smoothLngMin, smoothLatMax], // Top-left
+              [smoothLngMin, smoothLatMin]  // Close polygon
+            ]]
+          }
+        })
+      }
+    }
+
+    console.log(`Created ${features.length} smooth filled squares with 21-color spectrum`)
+
+    // Add traffic source with CSV data
+    map.value.addSource('traffic', {
+      'type': 'geojson',
+      'data': {
+        'type': 'FeatureCollection',
+        'features': features
+      }
+    })
+
+    // Add traffic layer as smooth filled squares with ultra-large color spectrum
+    map.value.addLayer({
+      'id': 'traffic',
+      'type': 'fill',
+      'source': 'traffic',
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'fill-color': [
+          'interpolate',
+          ['linear'],
+          ['get', 'intensity'],
+          0.00, '#004d00',  // Very Dark Green
+          0.05, '#006600',  // Dark Green
+          0.10, '#008800',  // Forest Green
+          0.15, '#00aa00',  // Green
+          0.20, '#00cc00',  // Bright Green
+          0.25, '#00ff00',  // Pure Green
+          0.30, '#33ff33',  // Light Green
+          0.35, '#66ff66',  // Pale Green
+          0.40, '#99ff99',  // Very Light Green
+          0.45, '#ccffcc',  // Mint Green
+          0.50, '#ffff99',  // Light Yellow Green
+          0.55, '#ffff66',  // Yellow Green
+          0.60, '#ffff33',  // Yellow
+          0.65, '#ffff00',  // Pure Yellow
+          0.70, '#ffcc00',  // Golden Yellow
+          0.75, '#ff9900',  // Orange Yellow
+          0.80, '#ff6600',  // Orange
+          0.85, '#ff3300',  // Red Orange
+          0.90, '#ff0000',  // Red
+          0.95, '#cc0000',  // Dark Red
+          1.00, '#990000'   // Very Dark Red
+        ],
+        'fill-opacity': 0.8,
+        'fill-outline-color': 'transparent'
+      }
+    })
+
+    console.log(`Loaded ${features.length} traffic data points`)
+  } catch (error) {
+    console.error('Error loading CSV data:', error)
+  }
+}
+
 // Initialize map
 const initializeMap = async () => {
   // Dynamically import mapbox-gl
@@ -227,6 +361,7 @@ const initializeMap = async () => {
   
   // Initialize scrollama when map loads
   map.value.on('load', () => {
+    loadTrafficData()
     initializeScrollama()
   })
 }

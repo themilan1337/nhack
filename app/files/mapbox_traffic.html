@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Mapbox Traffic Visualization</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
+
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+
+
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #menu {
+            background: #fff;
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            right: 10px;
+            border-radius: 3px;
+            width: 120px;
+            border: 1px solid rgba(0,0,0,0.4);
+            font-family: 'Open Sans', sans-serif;
+        }
+        #menu a {
+            font-size: 13px;
+            color: #404040;
+            display: block;
+            margin: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0,0,0,0.25);
+            text-align: center;
+        }
+        #menu a:last-child {
+            border: none;
+        }
+        #menu a:hover {
+            background-color: #f8f8f8;
+            color: #404040;
+        }
+        #menu a.active {
+            background-color: #3887be;
+            color: #ffffff;
+        }
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            max-width: 300px;
+            z-index: 1;
+        }
+        .route-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            min-width: 250px;
+            display: none;
+            z-index: 1000;
+        }
+        .route-panel h4 {
+            margin: 0 0 10px 0;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<nav id='menu'>
+    <a href='#' class='active' onclick='toggleTraffic()'>Hide Traffic</a>
+    <a href='#' onclick='startRouteMode()'>Find Route A→B</a>
+    <a href='#' onclick='clearRoute()' style='display:none' id='clearBtn'>Clear Route</a>
+</nav>
+
+<div class='info-panel'>
+    <h3>Плавная карта трафика</h3>
+    <p>Заполненные квадраты с ультра-плавной градацией (21 цвет).</p>
+    <p><strong style="color: #004d00;">■</strong> <strong>Очень тёмно-зелёный:</strong> Минимум (0.0)</p>
+    <p><strong style="color: #008800;">■</strong> <strong>Лесной зелёный:</strong> Низкий (0.1)</p>
+    <p><strong style="color: #00ff00;">■</strong> <strong>Ярко-зелёный:</strong> Хороший (0.25)</p>
+    <p><strong style="color: #66ff66;">■</strong> <strong>Бледно-зелёный:</strong> Умеренный (0.35)</p>
+    <p><strong style="color: #ccffcc;">■</strong> <strong>Мятный:</strong> Средний (0.45)</p>
+    <p><strong style="color: #ffff99;">■</strong> <strong>Жёлто-зелёный:</strong> Повышенный (0.5)</p>
+    <p><strong style="color: #ffff00;">■</strong> <strong>Жёлтый:</strong> Заметный (0.65)</p>
+    <p><strong style="color: #ffcc00;">■</strong> <strong>Золотой:</strong> Высокий (0.7)</p>
+    <p><strong style="color: #ff9900;">■</strong> <strong>Оранжево-жёлтый:</strong> Серьёзный (0.75)</p>
+    <p><strong style="color: #ff6600;">■</strong> <strong>Оранжевый:</strong> Тяжёлый (0.8)</p>
+    <p><strong style="color: #ff3300;">■</strong> <strong>Красно-оранжевый:</strong> Критический (0.85)</p>
+    <p><strong style="color: #ff0000;">■</strong> <strong>Красный:</strong> Пробка (0.9)</p>
+    <p><strong style="color: #990000;">■</strong> <strong>Тёмно-красный:</strong> Максимум (1.0)</p>
+    <p><small>Плавные переходы между всеми 21 цветом спектра</small></p>
+</div>
+
+<div class='route-panel' id='routePanel'>
+    <h4>🚗 Поиск маршрута</h4>
+    <div id='routeStatus'>Кликните для выбора точки А</div>
+    <div id='routeInfo' style='margin-top: 10px;'></div>
+</div>
+
+<script>
+// Add your Mapbox access token here
+// You need to get this from https://account.mapbox.com/
+mapboxgl.accessToken = 'pk.eyJ1IjoibWlsYW4xMzM3IiwiYSI6ImNtZmliNGw1NjBqMHUya3F3N2ZlYmI4dGkifQ.1wSnZEu14y4snJroP8xOYA';
+
+// Initialize the map
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11', // You can change this to other styles
+    center: [71.414, 51.086719], // Astana coordinates
+    zoom: 14
+});
+
+// Traffic visibility state
+let trafficVisible = true;
+
+// Route finding variables
+let routeMode = false;
+let pointA = null;
+let pointB = null;
+let routeMarkers = [];
+let routeLine = null;
+let trafficData = new Map(); // Store traffic data for pathfinding
+let trafficGraph = new Map(); // Graph for pathfinding
+
+map.on('load', function () {
+    // Load CSV data and create traffic visualization
+    fetch('/files/grid_data.csv')
+        .then(response => response.text())
+        .then(data => {
+            const lines = data.split('\n');
+            const gridData = new Map();
+            const features = [];
+
+            // Create filled squares using exact corner coordinates from CSV
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const [cell_id, lat_center, lng_center, lat_min, lat_max, lng_min, lng_max, point_density, avg_speed, traffic_load] = line.split(',');
+
+                if (lat_min && lat_max && lng_min && lng_max && traffic_load) {
+                    const load = parseFloat(traffic_load);
+                    const speed = parseFloat(avg_speed);
+                    const latMin = parseFloat(lat_min);
+                    const latMax = parseFloat(lat_max);
+                    const lngMin = parseFloat(lng_min);
+                    const lngMax = parseFloat(lng_max);
+
+                    // Ultra-smooth intensity mapping for maximum color gradation
+                    // Normalize traffic_load from 0-1 range to get smooth transitions
+                    const intensity = Math.min(1.0, Math.max(0.0, load));
+
+                    // Store traffic data for pathfinding
+                    const centerLat = parseFloat(lat_center);
+                    const centerLng = parseFloat(lng_center);
+                    const [row, col] = cell_id.split('_').map(n => parseInt(n));
+
+                    trafficData.set(cell_id, {
+                        lat: centerLat,
+                        lng: centerLng,
+                        latMin: latMin,
+                        latMax: latMax,
+                        lngMin: lngMin,
+                        lngMax: lngMax,
+                        traffic_load: load,
+                        avg_speed: speed,
+                        row: row,
+                        col: col,
+                        weight: load + (1.0 / Math.max(speed, 1)) // Combined weight for pathfinding
+                    });
+
+                    // Create filled polygon using corner coordinates with slight overlap
+                    const overlap = 0.000005; // Very small overlap to eliminate gaps
+                    const smoothLngMin = lngMin - overlap;
+                    const smoothLngMax = lngMax + overlap;
+                    const smoothLatMin = latMin - overlap;
+                    const smoothLatMax = latMax + overlap;
+
+                    features.push({
+                        type: 'Feature',
+                        properties: {
+                            intensity: intensity,
+                            traffic_load: load,
+                            avg_speed: speed,
+                            cell_id: cell_id,
+                            point_density: parseFloat(point_density) || 0
+                        },
+                        geometry: {
+                            type: 'Polygon',
+                            coordinates: [[
+                                [smoothLngMin, smoothLatMin], // Bottom-left
+                                [smoothLngMax, smoothLatMin], // Bottom-right
+                                [smoothLngMax, smoothLatMax], // Top-right
+                                [smoothLngMin, smoothLatMax], // Top-left
+                                [smoothLngMin, smoothLatMin]  // Close polygon
+                            ]]
+                        }
+                    });
+                }
+            }
+
+            // Build traffic graph for pathfinding
+            buildTrafficGraph();
+
+            console.log(`Created ${features.length} smooth filled squares with 21-color spectrum`);
+            console.log(`Built traffic graph with ${trafficData.size} nodes`);
+
+            // Add traffic source with CSV data
+            map.addSource('traffic', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': features
+                }
+            });
+
+            // Add traffic layer as smooth filled squares with ultra-large color spectrum
+            map.addLayer({
+                'id': 'traffic',
+                'type': 'fill',
+                'source': 'traffic',
+                'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'intensity'],
+                        0.00, '#004d00',  // Very Dark Green
+                        0.05, '#006600',  // Dark Green
+                        0.10, '#008800',  // Forest Green
+                        0.15, '#00aa00',  // Green
+                        0.20, '#00cc00',  // Bright Green
+                        0.25, '#00ff00',  // Pure Green
+                        0.30, '#33ff33',  // Light Green
+                        0.35, '#66ff66',  // Pale Green
+                        0.40, '#99ff99',  // Very Light Green
+                        0.45, '#ccffcc',  // Mint Green
+                        0.50, '#ffff99',  // Light Yellow Green
+                        0.55, '#ffff66',  // Yellow Green
+                        0.60, '#ffff33',  // Yellow
+                        0.65, '#ffff00',  // Pure Yellow
+                        0.70, '#ffcc00',  // Golden Yellow
+                        0.75, '#ff9900',  // Orange Yellow
+                        0.80, '#ff6600',  // Orange
+                        0.85, '#ff3300',  // Red Orange
+                        0.90, '#ff0000',  // Red
+                        0.95, '#cc0000',  // Dark Red
+                        1.00, '#990000'   // Very Dark Red
+                    ],
+                    'fill-opacity': 0.8,
+                    'fill-outline-color': 'transparent'
+                }
+            });
+
+            console.log(`Loaded ${features.length} traffic data points`);
+        })
+        .catch(error => {
+            console.error('Error loading CSV data:', error);
+            // Fallback to Mapbox traffic data
+            map.addSource('traffic', {
+                'type': 'vector',
+                'url': 'mapbox://mapbox.mapbox-traffic-v1'
+            });
+
+            map.addLayer({
+                'id': 'traffic',
+                'type': 'line',
+                'source': 'traffic',
+                'source-layer': 'traffic',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'line-width': [
+                        'case',
+                        ['==', ['get', 'congestion'], 'low'], 4,
+                        ['==', ['get', 'congestion'], 'moderate'], 6,
+                        ['==', ['get', 'congestion'], 'heavy'], 8,
+                        ['==', ['get', 'congestion'], 'severe'], 10,
+                        4
+                    ],
+                    'line-color': [
+                        'case',
+                        ['==', ['get', 'congestion'], 'low'],
+                        '#22c55e',
+                        ['==', ['get', 'congestion'], 'moderate'],
+                        '#eab308',
+                        ['==', ['get', 'congestion'], 'heavy'],
+                        '#ef4444',
+                        ['==', ['get', 'congestion'], 'severe'],
+                        '#dc2626',
+                        '#22c55e'
+                    ],
+                    'line-opacity': 0.8
+                }
+            });
+        });
+
+    // Add navigation control
+    map.addControl(new mapboxgl.NavigationControl());
+
+    // Add fullscreen control
+    map.addControl(new mapboxgl.FullscreenControl());
+
+    // Add geolocate control to find user's location
+    map.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            showUserHeading: true
+        })
+    );
+
+    console.log('Map loaded with traffic data');
+});
+
+// Function to toggle traffic
+function toggleTraffic() {
+    trafficVisible = !trafficVisible;
+
+    // Toggle traffic layer
+    if (map.getLayer('traffic')) {
+        map.setLayoutProperty(
+            'traffic',
+            'visibility',
+            trafficVisible ? 'visible' : 'none'
+        );
+    }
+
+    // Update button text
+    const button = document.querySelector('#menu a');
+    button.textContent = trafficVisible ? 'Hide Traffic' : 'Show Traffic';
+}
+
+// Add click event to get traffic data at clicked location
+map.on('click', 'traffic', function(e) {
+    const properties = e.features[0].properties;
+    const coordinates = e.lngLat;
+
+    // Convert intensity to percentage and traffic level description
+    const intensityPercent = (properties.intensity * 100).toFixed(0);
+    let trafficLevel = '';
+    let colorCode = '';
+
+    if (properties.intensity >= 1.0) {
+        trafficLevel = 'Экстремальные пробки (0.95+)';
+        colorCode = '#C62828';
+    } else if (properties.intensity >= 0.9) {
+        trafficLevel = 'Выше 75% (0.91-0.95)';
+        colorCode = '#E53935';
+    } else if (properties.intensity >= 0.8) {
+        trafficLevel = 'Тяжёлые заторы (0.85-0.91)';
+        colorCode = '#F44336';
+    } else if (properties.intensity >= 0.7) {
+        trafficLevel = 'Значительные заторы (0.8-0.85)';
+        colorCode = '#FF5722';
+    } else if (properties.intensity >= 0.6) {
+        trafficLevel = 'Выше медианы (0.74-0.8)';
+        colorCode = '#FF9800';
+    } else if (properties.intensity >= 0.5) {
+        trafficLevel = 'Около медианы (0.7-0.74)';
+        colorCode = '#FFC107';
+    } else if (properties.intensity >= 0.4) {
+        trafficLevel = 'Ниже медианы (0.65-0.7)';
+        colorCode = '#FFEB3B';
+    } else if (properties.intensity >= 0.3) {
+        trafficLevel = 'Выше 25% (0.57-0.65)';
+        colorCode = '#CDDC39';
+    } else if (properties.intensity >= 0.2) {
+        trafficLevel = 'Хорошо (0.5-0.57)';
+        colorCode = '#8BC34A';
+    } else if (properties.intensity >= 0.1) {
+        trafficLevel = 'Очень хорошо (0.4-0.5)';
+        colorCode = '#7CB342';
+    } else {
+        trafficLevel = 'Свободно (<0.4)';
+        colorCode = '#00C851';
+    }
+
+    new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(`
+            <h3>Квадрат трафика</h3>
+            <p><strong>Ячейка:</strong> ${properties.cell_id}</p>
+            <p><strong>Загруженность:</strong> ${properties.traffic_load.toFixed(4)}</p>
+            <p><strong>Средняя скорость:</strong> ${properties.avg_speed.toFixed(1)} км/ч</p>
+            <p><strong>Плотность точек:</strong> ${properties.point_density}</p>
+            <p><strong>Цвет трафика:</strong> <span style="color: ${colorCode}; font-size: 18px;">■</span> ${trafficLevel}</p>
+            <p><strong>Интенсивность:</strong> ${intensityPercent}% (${properties.intensity.toFixed(4)})</p>
+            <p><strong>Координаты:</strong><br>
+            Lat: ${coordinates.lat.toFixed(6)}<br>
+            Lng: ${coordinates.lng.toFixed(6)}</p>
+        `)
+        .addTo(map);
+});
+
+// Change cursor on hover
+map.on('mouseenter', 'traffic', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'traffic', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+// Handle map errors
+map.on('error', function(e) {
+    console.error('Map error:', e);
+    alert('Map loading error. Please check your Mapbox access token.');
+});
+
+// Route finding functions
+function startRouteMode() {
+    routeMode = true;
+    pointA = null;
+    pointB = null;
+
+    // Show route panel
+    document.getElementById('routePanel').style.display = 'block';
+    document.getElementById('routeStatus').textContent = 'Кликните на карте для выбора точки А (начало маршрута)';
+
+    // Change cursor
+    map.getCanvas().style.cursor = 'crosshair';
+
+    console.log('Route mode activated');
+}
+
+function clearRoute() {
+    routeMode = false;
+    pointA = null;
+    pointB = null;
+
+    // Hide route panel
+    document.getElementById('routePanel').style.display = 'none';
+    document.getElementById('clearBtn').style.display = 'none';
+
+    // Remove markers
+    routeMarkers.forEach(marker => marker.remove());
+    routeMarkers = [];
+
+    // Remove route line
+    if (map.getSource('route')) {
+        map.removeLayer('route');
+        map.removeSource('route');
+    }
+
+    // Reset cursor
+    map.getCanvas().style.cursor = '';
+
+    console.log('Route cleared');
+}
+
+// Handle map clicks for route selection
+map.on('click', function(e) {
+    if (!routeMode) return;
+
+    const coordinates = [e.lngLat.lng, e.lngLat.lat];
+
+    if (!pointA) {
+        // Set point A
+        pointA = coordinates;
+
+        // Add marker for point A
+        const markerA = new mapboxgl.Marker({ color: '#00ff00' })
+            .setLngLat(coordinates)
+            .setPopup(new mapboxgl.Popup().setHTML('<h4>Точка А (начало)</h4>'))
+            .addTo(map);
+        routeMarkers.push(markerA);
+
+        // Update status
+        document.getElementById('routeStatus').textContent = 'Кликните для выбора точки Б (конец маршрута)';
+
+    } else if (!pointB) {
+        // Set point B
+        pointB = coordinates;
+
+        // Add marker for point B
+        const markerB = new mapboxgl.Marker({ color: '#ff0000' })
+            .setLngLat(coordinates)
+            .setPopup(new mapboxgl.Popup().setHTML('<h4>Точка Б (конец)</h4>'))
+            .addTo(map);
+        routeMarkers.push(markerB);
+
+        // Calculate and display route
+        calculateRoute(pointA, pointB);
+
+        // Update status
+        document.getElementById('routeStatus').textContent = '✅ Маршрут построен!';
+        document.getElementById('clearBtn').style.display = 'block';
+
+        // Reset cursor
+        map.getCanvas().style.cursor = '';
+        routeMode = false;
+    }
+});
+
+// Build traffic graph for pathfinding
+function buildTrafficGraph() {
+    trafficGraph.clear();
+
+    // Build graph connections between adjacent cells
+    for (let [cellId, cellData] of trafficData) {
+        const neighbors = [];
+        const row = cellData.row;
+        const col = cellData.col;
+
+        // Check 4 adjacent cells (up, down, left, right)
+        const adjacentCells = [
+            `${row-1}_${col}`,     // Up
+            `${row+1}_${col}`,     // Down
+            `${row}_${col-1}`,     // Left
+            `${row}_${col+1}`      // Right
+        ];
+
+        for (let neighborId of adjacentCells) {
+            if (trafficData.has(neighborId)) {
+                const neighbor = trafficData.get(neighborId);
+                // Calculate distance between cells (Euclidean distance)
+                const dx = cellData.lng - neighbor.lng;
+                const dy = cellData.lat - neighbor.lat;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Weight = distance * traffic_weight (higher traffic_load = higher weight)
+                const weight = distance * neighbor.weight;
+
+                neighbors.push({
+                    id: neighborId,
+                    weight: weight,
+                    distance: distance
+                });
+            }
+        }
+
+        trafficGraph.set(cellId, neighbors);
+    }
+
+    console.log(`Built traffic graph with ${trafficGraph.size} nodes and connections`);
+}
+
+// Dijkstra pathfinding algorithm using traffic-aware weights
+function findTrafficAwarePath(startLat, startLng, endLat, endLng) {
+    // Find closest cells to start and end points
+    let startCell = null;
+    let endCell = null;
+    let minStartDist = Infinity;
+    let minEndDist = Infinity;
+
+    for (let [cellId, cellData] of trafficData) {
+        // Distance to start point
+        const startDist = Math.sqrt(
+            Math.pow(cellData.lat - startLat, 2) +
+            Math.pow(cellData.lng - startLng, 2)
+        );
+        if (startDist < minStartDist) {
+            minStartDist = startDist;
+            startCell = cellId;
+        }
+
+        // Distance to end point
+        const endDist = Math.sqrt(
+            Math.pow(cellData.lat - endLat, 2) +
+            Math.pow(cellData.lng - endLng, 2)
+        );
+        if (endDist < minEndDist) {
+            minEndDist = endDist;
+            endCell = cellId;
+        }
+    }
+
+    if (!startCell || !endCell) {
+        console.log('Could not find start or end cells');
+        return null;
+    }
+
+    console.log(`Pathfinding from ${startCell} to ${endCell}`);
+
+    // Dijkstra's algorithm
+    const distances = new Map();
+    const previous = new Map();
+    const unvisited = new Set();
+
+    // Initialize distances
+    for (let [cellId] of trafficData) {
+        distances.set(cellId, Infinity);
+        unvisited.add(cellId);
+    }
+    distances.set(startCell, 0);
+
+    while (unvisited.size > 0) {
+        // Find unvisited node with minimum distance
+        let currentCell = null;
+        let minDistance = Infinity;
+
+        for (let cellId of unvisited) {
+            if (distances.get(cellId) < minDistance) {
+                minDistance = distances.get(cellId);
+                currentCell = cellId;
+            }
+        }
+
+        if (currentCell === null || minDistance === Infinity) {
+            break; // No more reachable nodes
+        }
+
+        unvisited.delete(currentCell);
+
+        // If we reached the destination
+        if (currentCell === endCell) {
+            break;
+        }
+
+        // Check neighbors
+        const neighbors = trafficGraph.get(currentCell) || [];
+        for (let neighbor of neighbors) {
+            if (unvisited.has(neighbor.id)) {
+                const altDistance = distances.get(currentCell) + neighbor.weight;
+                if (altDistance < distances.get(neighbor.id)) {
+                    distances.set(neighbor.id, altDistance);
+                    previous.set(neighbor.id, currentCell);
+                }
+            }
+        }
+    }
+
+    // Reconstruct path
+    const path = [];
+    let currentCell = endCell;
+
+    while (currentCell !== undefined) {
+        const cellData = trafficData.get(currentCell);
+        path.unshift([cellData.lng, cellData.lat]);
+        currentCell = previous.get(currentCell);
+    }
+
+    if (path.length > 0) {
+        console.log(`Found traffic-aware path with ${path.length} points`);
+        return path;
+    }
+
+    console.log('No path found');
+    return null;
+}
+
+// Traffic-aware route calculation using custom pathfinding
+async function calculateRoute(start, end) {
+    try {
+        // Use custom traffic-aware pathfinding
+        console.log(`Calculating traffic-aware route from [${start[1]}, ${start[0]}] to [${end[1]}, ${end[0]}]`);
+
+        const route = findTrafficAwarePath(start[1], start[0], end[1], end[0]);
+
+        if (!route || route.length === 0) {
+            throw new Error('No traffic-aware path found');
+        }
+
+        // Add route to map
+        if (map.getSource('route')) {
+            map.getSource('route').setData({
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: route
+                }
+            });
+        } else {
+            map.addSource('route', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: route
+                    }
+                }
+            });
+
+            map.addLayer({
+                id: 'route',
+                type: 'line',
+                source: 'route',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': '#0080ff',
+                    'line-width': 6,
+                    'line-opacity': 0.8
+                }
+            });
+        }
+
+        // Calculate total distance and estimated time
+        let totalDistance = 0;
+        let totalTrafficWeight = 0;
+        let segments = 0;
+
+        for (let i = 0; i < route.length - 1; i++) {
+            const dx = route[i+1][0] - route[i][0];
+            const dy = route[i+1][1] - route[i][1];
+            const segmentDistance = Math.sqrt(dx * dx + dy * dy);
+            totalDistance += segmentDistance;
+            segments++;
+
+            // Find traffic data for this segment
+            for (let [cellId, cellData] of trafficData) {
+                const centerDist = Math.sqrt(
+                    Math.pow(cellData.lat - route[i][1], 2) +
+                    Math.pow(cellData.lng - route[i][0], 2)
+                );
+                if (centerDist < 0.01) { // Close enough to this traffic cell
+                    totalTrafficWeight += cellData.weight;
+                    break;
+                }
+            }
+        }
+
+        // Convert distance from degrees to kilometers (approximate)
+        const distanceKm = (totalDistance * 111).toFixed(1); // 1 degree ≈ 111 km
+        const avgWeight = segments > 0 ? (totalTrafficWeight / segments) : 1.0;
+        const estimatedTime = Math.round(parseFloat(distanceKm) * avgWeight * 2); // Rough estimation
+
+        // Display route info
+        document.getElementById('routeInfo').innerHTML =
+            '<strong>📍 Расстояние:</strong> ' + distanceKm + ' км<br>' +
+            '<strong>⏱️ Время в пути:</strong> ' + estimatedTime + ' мин<br>' +
+            '<strong>🚦 Средняя нагрузка:</strong> ' + avgWeight.toFixed(2) + '<br>' +
+            '<small>✅ Учтена нагрузка трафика из CSV данных</small>';
+
+    } catch (error) {
+        console.error('Traffic-aware route calculation error:', error);
+        document.getElementById('routeInfo').innerHTML =
+            '<span style="color: #ff6b6b;">❌ Ошибка построения маршрута</span>';
+    }
+}
+</script>
+
+</body>
+</html>
