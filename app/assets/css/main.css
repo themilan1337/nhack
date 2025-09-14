@@ -16,7 +16,8 @@
 }
 
 body {
-  font-family: "Host Grotesk";
+  font-family: "Epilogue" !important;
+  font-weight: 900 !important;
 }
 
 img {
@@ -180,7 +181,7 @@ img {
 .preloader-logo h1 {
   position: relative;
   color: var(--base-300);
-  font-size: 3rem;
+  font-size: 8rem;
   font-weight: 500;
   line-height: 1;
 }

@@ -1,19 +1,10 @@
 <template>
     <div class="preloader-progress">
       <div class="preloader-progress-bar"></div>
-      <div class="preloader-logo"><h1>Obsidian</h1></div>
+      <div class="preloader-logo"><h1>inDrive</h1></div>
     </div>
 
     <div class="preloader-mask"></div>
-
-    <div class="preloader-content">
-      <div class="preloader-footer">
-        <p>
-          Spaces unfold in light and shadow, where structure finds its quiet
-          rhythm, and time align in harmony.
-        </p>
-      </div>
-    </div>
 
     <div class="!p-4 w-screen h-screen">
         <video 
@@ -30,10 +21,13 @@
 <script setup>
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { onMounted } from "vue";
 
 gsap.registerPlugin(SplitText);
 
-document.fonts.ready.then(() => {
+onMounted(() => {
+  if (typeof document !== 'undefined' && document.fonts) {
+    document.fonts.ready.then(() => {
   function createSplitTexts(elements) {
     const splits = {};
 
@@ -201,5 +195,7 @@ document.fonts.ready.then(() => {
       },
       "<"
     );
+    });
+  }
 });
 </script>
