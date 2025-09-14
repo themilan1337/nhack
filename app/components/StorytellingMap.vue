@@ -138,7 +138,7 @@ const storytellingConfig = {
       description: 'Join us as we continue to innovate and expand, creating a more connected and accessible world through smart transportation solutions. <br><br><a href="#contact" style="color: #00d4aa; font-weight: bold;">Get Started Today →</a>',
       location: {
         center: [71.41611111, 51.09027778],
-        zoom: 14,
+        zoom: 2,
         pitch: 0,
         bearing: 90
       },

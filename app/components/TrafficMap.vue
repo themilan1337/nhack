@@ -273,6 +273,9 @@ const setupMapEvents = async () => {
 
   // Click event for traffic info
   map.value.on('click', 'traffic', (e) => {
+    // Don't show traffic details popup when in route mode
+    if (routeMode.value) return
+    
     const properties = e.features[0].properties
     const coordinates = e.lngLat
 
@@ -606,6 +609,9 @@ const calculateRoute = async (start, end) => {
       '<strong>⏱️ Travel Time:</strong> ' + estimatedTime + ' min<br>' +
       '<strong>🚦 Average Load:</strong> ' + avgWeight.toFixed(2) + '<br>' +
       '<small>✅ Traffic load from CSV data considered</small>'
+    
+    // Show the route panel with the calculated route info
+    showRoutePanel.value = true
   } catch (error) {
     console.error('Traffic-aware route calculation error:', error)
     routeInfo.value = '<span style="color: #ff6b6b;">❌ Route calculation error</span>'
