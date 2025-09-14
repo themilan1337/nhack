@@ -6,8 +6,8 @@
     <!-- Story Content -->
     <div id="story" class="story-container">
       <!-- Header -->
-      <div v-if="config.title || config.subtitle" id="header" :class="config.theme" class="header">
-        <h1 v-if="config.title">{{ config.title }}</h1>
+      <div v-if="config.title || config.subtitle" id="header" :class="config.theme" class="header m-4">
+        <h1 class="font-bold text-sm" v-if="config.title">{{ config.title }}</h1>
         <h2 v-if="config.subtitle">{{ config.subtitle }}</h2>
       </div>
       
