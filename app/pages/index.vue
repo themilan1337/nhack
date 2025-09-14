@@ -19,7 +19,7 @@
         ></video>
         
         <!-- Dark Overlay -->
-        <div class="absolute inset-4 bg-black/40 rounded-2xl pointer-events-none"></div>
+        <div class="absolute inset-4 bg-black/70 rounded-2xl pointer-events-none"></div>
         
         <!-- Logo at Top -->
         <div class="absolute top-8 left-8 md:top-12 md:left-12 z-10 pointer-events-none">
