@@ -12,8 +12,11 @@
   "dependencies": {
     "@nuxt/fonts": "0.11.4",
     "@nuxt/image": "1.11.0",
+    "@tailwindcss/vite": "^4.1.13",
+    "gsap": "^3.13.0",
     "nuxt": "^4.1.1",
     "nuxt-mapbox": "1.6.4",
+    "tailwindcss": "^4.1.13",
     "vue": "^3.5.21",
     "vue-router": "^4.5.1"
   },
