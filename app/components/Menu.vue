@@ -17,11 +17,10 @@
         <div class="menu-content-wrapper">
           <div class="menu-content-main">
             <div class="menu-col">
-              <div class="menu-link hover:underline"><a href="#">Home</a></div>
-              <div class="menu-link hover:underline"><a href="#">About</a></div>
-              <div class="menu-link hover:underline"><a href="#">Services</a></div>
-              <div class="menu-link hover:underline"><a href="#">Contact</a></div>
-              <div class="menu-link hover:underline"><a href="#">Careers</a></div>
+              <div class="menu-link hover:underline"><NuxtLink to="/" @click="closeMenu">Home</NuxtLink></div>
+              <div class="menu-link hover:underline"><NuxtLink to="/about" @click="closeMenu">About</NuxtLink></div>
+              <div class="menu-link hover:underline"><NuxtLink to="/services" @click="closeMenu">Services</NuxtLink></div>
+              <div class="menu-link hover:underline"><NuxtLink to="/contact" @click="closeMenu">Contact</NuxtLink></div>
             </div>
 
             <div class="menu-col">
