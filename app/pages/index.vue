@@ -18,7 +18,6 @@
             class="w-full h-full object-cover rounded-2xl"
         ></video>
     </div>
-    
 </template>
 <script setup>
 import gsap from "gsap";
@@ -27,15 +26,44 @@ import { SplitText } from "gsap/SplitText";
 gsap.registerPlugin(SplitText);
 
 document.fonts.ready.then(() => {
-  // Only create split text for preloader logo
-  const logoSplit = SplitText.create(".preloader-logo h1", {
-    type: "chars",
-    mask: "chars",
-    charsClass: "char"
-  });
+  function createSplitTexts(elements) {
+    const splits = {};
 
-  // Set initial states for preloader elements
-  gsap.set(logoSplit.chars, { x: "100%" });
+    elements.forEach(({ key, selector, type }) => {
+      const config = { type, mask: type };
+
+      if (type === "chars") config.charsClass = "char";
+      if (type === "lines") config.linesClass = "line";
+      splits[key] = SplitText.create(selector, config);
+    });
+
+    return splits;
+  }
+
+  const splitElements = [
+    { key: "logoChars", selector: ".preloader-logo h1", type: "chars" },
+    { key: "footerLines", selector: ".preloader-footer p", type: "lines" },
+    { key: "headerChars", selector: ".header h1", type: "chars" },
+    { key: "heroFooterH3", selector: ".hero-footer h3", type: "lines" },
+    { key: "heroFooterP", selector: ".hero-footer p", type: "lines" },
+    { key: "btnLabels", selector: ".btn-label span", type: "lines" },
+  ];
+
+  const splits = createSplitTexts(splitElements);
+
+  gsap.set([splits.logoChars.chars], { x: "100%" });
+  gsap.set(
+    [
+      splits.footerLines.lines,
+      splits.headerChars.chars,
+      splits.heroFooterH3.lines,
+      splits.heroFooterP.lines,
+      splits.btnLabels.lines,
+    ],
+    { y: "100%" }
+  );
+  gsap.set(".btn-icon", { clipPath: "circle(0% at 50% 50%)" });
+  gsap.set(".btn", { scale: 0 });
 
   function animateProgress(duration = 4) {
     const tl = gsap.timeline();
@@ -59,19 +87,28 @@ document.fonts.ready.then(() => {
     return tl;
   }
 
-  // Preloader animation timeline
   const tl = gsap.timeline({ delay: 0.5 });
 
-  tl.to(logoSplit.chars, {
+  tl.to(splits.logoChars.chars, {
     x: "0%",
     stagger: 0.05,
     duration: 1,
     ease: "power4.inOut",
   })
-    .add(animateProgress(), "0.25")
+    .to(
+      splits.footerLines.lines,
+      {
+        y: "0%",
+        stagger: 0.1,
+        duration: 1,
+        ease: "power4.inOut",
+      },
+      "0.25"
+    )
+    .add(animateProgress(), "<")
     .set(".preloader-progress", { backgroundColor: "#fff" })
     .to(
-      logoSplit.chars,
+      splits.logoChars.chars,
       {
         x: "-100%",
         stagger: 0.05,
@@ -79,6 +116,16 @@ document.fonts.ready.then(() => {
         ease: "power4.inOut",
       },
       "-=0.5"
+    )
+    .to(
+      splits.footerLines.lines,
+      {
+        y: "-100%",
+        stagger: 0.1,
+        duration: 1,
+        ease: "power4.inOut",
+      },
+      "<"
     )
     .to(
       ".preloader-progress",
@@ -95,6 +142,54 @@ document.fonts.ready.then(() => {
         scale: 6,
         duration: 2.5,
         ease: "power3.out",
+      },
+      "<"
+    )
+    .to(
+      ".hero-img",
+      {
+        scale: 1,
+        duration: 1.5,
+        ease: "power3.out",
+      },
+      "<"
+    )
+    .to(splits.headerChars.chars, {
+      y: 0,
+      stagger: 0.05,
+      duration: 1,
+      ease: "power4.out",
+      delay: -2,
+    })
+    .to(
+      [splits.heroFooterH3.lines, splits.heroFooterP.lines],
+      {
+        y: 0,
+        stagger: 0.1,
+        duration: 1,
+        ease: "power4.out",
+      },
+      "-=1.5"
+    )
+    .to(
+      ".btn",
+      {
+        scale: 1,
+        duration: 1,
+        ease: "power4.out",
+        onStart: () => {
+          tl.to(".btn-icon", {
+            clipPath: "circle(100% at 50% 50%)",
+            duration: 1,
+            ease: "power2.out",
+            delay: -1.25,
+          }).to(splits.btnLabels.lines, {
+            y: 0,
+            duration: 1,
+            ease: "power4.out",
+            delay: -1.25,
+          });
+        },
       },
       "<"
     );
