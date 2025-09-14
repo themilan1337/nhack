@@ -6,7 +6,8 @@
 
     <div class="preloader-mask"></div>
 
-    <div class="!p-4 w-screen h-screen">
+    <!-- Hero Video Section -->
+    <div class="hero-video-section">
         <video 
             src="/assets/hero.mp4"
             loop
@@ -221,6 +222,15 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.hero-video-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem;
+  z-index: 100;
+  background: #000;
+}
+
 .storytelling-section {
   position: relative;
   width: 100%;
