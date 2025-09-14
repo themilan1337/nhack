@@ -3,12 +3,7 @@
     <!-- Map Container -->
     <div id="traffic-map" class="map-container"></div>
     
-    <!-- Menu -->
-    <nav id="menu" class="menu">
-      <a href="#" class="active" @click="toggleTraffic">{{ trafficVisible ? 'Hide Traffic' : 'Show Traffic' }}</a>
-      <a href="#" @click="startRouteMode">Find Route A→B</a>
-      <a href="#" @click="clearRoute" v-show="showClearBtn" id="clearBtn">Clear Route</a>
-    </nav>
+
 
     <!-- Info Panel -->
     <div class="info-panel">
@@ -30,13 +25,25 @@
       <p><small>Smooth transitions between all 21 spectrum colors</small></p>
     </div>
 
-    <!-- Route Panel -->
-    <div v-if="showRoutePanel" class="route-panel">
-      <div class="route-header">
-        <button @click="showRoutePanel = false" class="close-btn">×</button>
-      </div>
-      <div class="route-content" v-html="routeInfo"></div>
+    <!-- Control Buttons -->
+    <div class="control-buttons">
+      <button @click="toggleTrafficVisibility" class="control-btn" :class="{ active: showTraffic }">
+        {{ showTraffic ? 'Hide Traffic' : 'Show Traffic' }}
+      </button>
+      <button @click="toggleRouteMode" class="control-btn" :class="{ active: routeMode }">
+        {{ routeMode ? 'Exit Route' : 'Find Route' }}
+      </button>
     </div>
+
+    <!-- Route Panel -->
+    <transition name="fade">
+      <div v-if="showRoutePanel" class="route-panel">
+        <div class="route-header">
+          <button @click="showRoutePanel = false" class="close-btn">×</button>
+        </div>
+        <div class="route-content" v-html="routeInfo"></div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -57,6 +64,7 @@ const showClearBtn = ref(false)
 const showRoutePanel = ref(false)
 const routeStatus = ref('Click to select point A')
 const routeInfo = ref('')
+const showTraffic = ref(true)
 
 // Initialize map
 const initializeMap = async () => {
@@ -67,7 +75,7 @@ const initializeMap = async () => {
   map.value = new mapboxgl.default.Map({
     container: 'traffic-map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [71.414, 51.086719],
+    center: [71.416111, 51.088889], // 51°05'20"N 71°24'58"E converted to decimal degrees
     zoom: 14
   })
 
@@ -357,33 +365,43 @@ const setupMapEvents = async () => {
   })
 }
 
-// Toggle traffic visibility
-const toggleTraffic = () => {
-  trafficVisible.value = !trafficVisible.value
+// Toggle traffic visibility for control buttons
+const toggleTrafficVisibility = () => {
+  showTraffic.value = !showTraffic.value
+  trafficVisible.value = showTraffic.value
 
   if (map.value.getLayer('traffic')) {
     map.value.setLayoutProperty(
       'traffic',
       'visibility',
-      trafficVisible.value ? 'visible' : 'none'
+      showTraffic.value ? 'visible' : 'none'
     )
   }
 }
 
+// Toggle route mode for control buttons
+ const toggleRouteMode = () => {
+   routeMode.value = !routeMode.value
+   if (routeMode.value) {
+     startRouteMode()
+   } else {
+     clearRoute()
+   }
+ }
+
 // Start route mode
-const startRouteMode = () => {
-  routeMode.value = true
+ const startRouteMode = () => {
+    routeMode.value = true
   pointA.value = null
   pointB.value = null
 
-  showRoutePanel.value = true
   routeStatus.value = 'Click on the map to select point A (route start)'
   map.value.getCanvas().style.cursor = 'crosshair'
 }
 
 // Clear route
-const clearRoute = () => {
-  routeMode.value = false
+ const clearRoute = () => {
+    routeMode.value = false
   pointA.value = null
   pointB.value = null
 
@@ -615,43 +633,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-.menu {
-  background: #fff;
-  position: absolute;
-  z-index: 1;
-  top: 10px;
-  right: 10px;
-  border-radius: 3px;
-  width: 120px;
-  border: 1px solid rgba(0,0,0,0.4);
-  font-family: 'Open Sans', sans-serif;
-}
 
-.menu a {
-  font-size: 13px;
-  color: #404040;
-  display: block;
-  margin: 0;
-  padding: 10px;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(0,0,0,0.25);
-  text-align: center;
-  cursor: pointer;
-}
-
-.menu a:last-child {
-  border: none;
-}
-
-.menu a:hover {
-  background-color: #f8f8f8;
-  color: #404040;
-}
-
-.menu a.active {
-  background-color: #3887be;
-  color: #ffffff;
-}
 
 .info-panel {
   position: absolute;
@@ -715,6 +697,52 @@ onUnmounted(() => {
   color: #333;
 }
 
+/* Control Buttons */
+.control-buttons {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.control-btn {
+  background: white;
+  color: #333;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  text-align: center;
+}
+
+.control-btn:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.control-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Fade Animation */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
 /* Hide OpenStreetMap attribution */
 :deep(.mapboxgl-ctrl-attrib) {
   display: none !important;
@@ -773,15 +801,19 @@ onUnmounted(() => {
     font-size: 14px;
   }
   
-  .menu {
-    width: 100px;
+  .control-buttons {
+    bottom: 15px;
+    right: 15px;
+    gap: 8px;
   }
   
-  .menu a {
-    font-size: 11px;
-    padding: 8px;
+  .control-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    min-width: 100px;
   }
   
+
   :deep(.mapboxgl-popup-content) {
     max-width: 250px;
     padding: 12px;
