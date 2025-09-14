@@ -1,19 +1,7 @@
-
-<!-- 
-.hero-video-section {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  padding: 1rem;
-  z-index: 100;
-  background: #FFF;
-} 
--->
-
 <template>
     <div class="preloader-progress">
       <div class="preloader-progress-bar"></div>
-      <div class="preloader-logo"><h1>inDrive</h1></div>
+      <div class="preloader-logo"><h1 class="epilogue">inDrive</h1></div>
     </div>
 
     <div class="preloader-mask"></div>
@@ -30,6 +18,7 @@
             class="w-full h-full object-cover rounded-2xl"
         ></video>
     </div>
+    
     
     <!-- Storytelling Map Section -->
     <div class="storytelling-section">
