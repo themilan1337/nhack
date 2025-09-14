@@ -54,6 +54,12 @@ const storytellingConfig = {
   title: 'inDrive Journey',
   subtitle: 'Discover the story behind our innovative transportation platform',
   footer: 'Experience the future of ride-sharing with inDrive',
+  // Global animation preferences (can be overridden per chapter)
+  animation: {
+    duration: 3200,          // ms
+    pauseAfterMove: 700,     // ms pause to "hold" after arriving
+    easingFn: (t) => 1 - Math.pow(1 - t, 3)
+  },
   chapters: [
     {
       id: 'intro-chapter',
@@ -161,6 +167,7 @@ const config = ref({ ...storytellingConfig, ...props.customConfig })
 const map = ref(null)
 const scroller = ref(null)
 const marker = ref(null)
+const isAnimating = ref(false)
 
 // Alignment classes
 const alignments = {
@@ -200,6 +207,23 @@ const setLayerOpacity = (layer) => {
   })
 }
 
+// Scroll lock utilities for creating pauses
+const preventDefault = (e) => { e.preventDefault() }
+const preventKeys = (e) => {
+  const keys = ['Space','PageUp','PageDown','End','Home','ArrowLeft','ArrowUp','ArrowRight','ArrowDown']
+  if (keys.includes(e.code)) e.preventDefault()
+}
+const lockScroll = () => {
+  window.addEventListener('wheel', preventDefault, { passive: false })
+  window.addEventListener('touchmove', preventDefault, { passive: false })
+  window.addEventListener('keydown', preventKeys, { passive: false })
+}
+const unlockScroll = () => {
+  window.removeEventListener('wheel', preventDefault, { passive: false })
+  window.removeEventListener('touchmove', preventDefault, { passive: false })
+  window.removeEventListener('keydown', preventKeys, { passive: false })
+}
+
 // Initialize map
 const initializeMap = async () => {
   // Dynamically import mapbox-gl
@@ -237,18 +261,60 @@ const initializeScrollama = () => {
   scroller.value
     .setup({
       step: '.step',
-      offset: 0.5,
+      offset: 0.6,
       progress: true
     })
     .onStepEnter(async (response) => {
+      // Avoid re-entrancy if already animating (helps enforce pause)
+      if (isAnimating.value) return
+
       const currentChapterIndex = config.value.chapters.findIndex(chap => chap.id === response.element.id)
       const chapter = config.value.chapters[currentChapterIndex]
       
       // Add active class
       response.element.classList.add('active')
       
-      // Animate map to chapter location
-      map.value[chapter.mapAnimation || 'flyTo'](chapter.location)
+      // Lock scroll to create a pause while the map animates
+      isAnimating.value = true
+      lockScroll()
+
+      // Build animation options with smooth/slow transition
+      const duration = chapter.duration ?? config.value.animation?.duration ?? 3200
+      const pauseAfter = chapter.pauseAfter ?? config.value.animation?.pauseAfterMove ?? 700
+      const easingFn = chapter.easingFn ?? config.value.animation?.easingFn ?? ((t) => 1 - Math.pow(1 - t, 3))
+      const method = chapter.mapAnimation || config.value.mapAnimation || 'flyTo'
+
+      const animateToChapter = () => {
+        map.value[method]({
+          ...chapter.location,
+          duration,
+          easing: easingFn,
+          essential: true
+        })
+      }
+
+      const finishPause = () => {
+        setTimeout(() => {
+          unlockScroll()
+          isAnimating.value = false
+        }, pauseAfter)
+      }
+
+      // Handle rotation animation sequencing if requested
+      if (chapter.rotateAnimation) {
+        map.value.once('moveend', () => {
+          const rotateNumber = map.value.getBearing()
+          map.value.rotateTo(rotateNumber + 180, {
+            duration: Math.max(2400, duration),
+            easing: (t) => t
+          })
+          map.value.once('moveend', finishPause)
+        })
+        animateToChapter()
+      } else {
+        map.value.once('moveend', finishPause)
+        animateToChapter()
+      }
       
       // Update marker position
       if (config.value.showMarkers && marker.value) {
@@ -263,17 +329,6 @@ const initializeScrollama = () => {
       // Execute callback if defined
       if (chapter.callback && typeof window[chapter.callback] === 'function') {
         window[chapter.callback]()
-      }
-      
-      // Handle rotation animation
-      if (chapter.rotateAnimation) {
-        map.value.once('moveend', () => {
-          const rotateNumber = map.value.getBearing()
-          map.value.rotateTo(rotateNumber + 180, {
-            duration: 30000,
-            easing: (t) => t
-          })
-        })
       }
     })
     .onStepExit((response) => {
@@ -301,6 +356,8 @@ onUnmounted(() => {
   if (map.value) {
     map.value.remove()
   }
+  // Ensure scroll is unlocked if component unmounts during animation
+  unlockScroll()
 })
 </script>
 
@@ -358,26 +415,37 @@ onUnmounted(() => {
 }
 
 .step {
-  padding-bottom: 50vh;
+  padding-bottom: 80vh;
   opacity: 0.25;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.45s ease;
 }
 
 .step.active {
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .chapter-content {
-  padding: 25px 50px;
-  line-height: 25px;
-  font-size: 13px;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
+  padding: 28px 48px;
+  line-height: 28px;
+  font-size: 14px;
+  border-radius: 16px;
+  /* Premium glassy card */
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.chapter-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
 }
 
 .chapter-content img {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .hidden {
@@ -424,8 +492,9 @@ onUnmounted(() => {
   }
   
   .chapter-content {
-    padding: 20px 25px;
-    font-size: 12px;
+    padding: 20px 24px;
+    font-size: 13px;
+    line-height: 28px;
   }
 }
 

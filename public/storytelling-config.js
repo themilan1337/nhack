@@ -15,7 +15,7 @@ export const storytellingConfig = {
       image: '',
       description: 'inDrive is revolutionizing transportation by putting passengers and drivers in control. Our platform allows you to negotiate fair prices and choose your preferred driver. <br><br><strong>Scroll down to explore our journey</strong>',
       location: {
-        center: [71.42, 51.0889], // Astana coordinates from existing MapBox.vue
+        center: [71.42, 51.0889],
         zoom: 10,
         pitch: 0,
         bearing: 0
