@@ -238,6 +238,32 @@ img {
   will-change: transform;
 }
 
+/* Menu z-index overrides */
+.menu-nav {
+  z-index: 99999 !important;
+}
+
+.menu-bar {
+  z-index: 100001 !important;
+}
+
+.menu-overlay {
+  z-index: 100000 !important;
+}
+
+/* Ensure storytelling map stays below menu */
+.storytelling-container {
+  z-index: 10 !important;
+}
+
+.map-container {
+  z-index: 1 !important;
+}
+
+.story-container {
+  z-index: 5 !important;
+}
+
 @media (max-width: 800px) {
   .hero-inner {
     border-radius: 3rem;

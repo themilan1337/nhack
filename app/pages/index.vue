@@ -1,4 +1,7 @@
 <template>
+    <!-- Menu Component -->
+    <Menu />
+    
     <div class="preloader-progress">
       <div class="preloader-progress-bar"></div>
       <div class="preloader-logo"><h1 class="epilogue">inDrive</h1></div>
@@ -69,6 +72,7 @@
 import gsap from "gsap";
 import { onMounted } from "vue";
 import StorytellingMap from "~/components/StorytellingMap.vue";
+import Menu from "~/components/Menu.vue";
 
 let SplitText;
 
