@@ -5,8 +5,8 @@
 
 :root {
   --base-100: #C0F11C;
-  --base-200: #FFF;
-  --base-300: #000;
+  --base-200: #000;
+  --base-300: #FFF;
 }
 
 * {
