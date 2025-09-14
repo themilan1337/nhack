@@ -29,8 +29,27 @@
         <!-- Text Overlay -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center px-4 md:px-8 lg:px-16 mt-16 md:mt-20 lg:mt-24">
-                <h1 class="hero-text epilogue text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-2xl leading-tight">
-                    Revolutionizing<br>Transportation
+                <h1 class="hero-text epilogue text-2xl md:text-4xl lg:text-6xl xl:text-7xl font-bold text-white drop-shadow-2xl leading-tight">
+                    Revolutionizing<br>Transportation 
+                    <span class="relative inline-block">
+                        system
+                        <svg 
+                            class="hero-line absolute top-0 left-0 w-full h-full pointer-events-none" 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 608 100" 
+                            fill="none"
+                            preserveAspectRatio="none"
+                        >
+                            <path 
+                                d="M322.902 98.9997C232.515 99.0422 140.637 94.7899 58.0275 80.853C31.532 76.3775 2.92086 69.1167 1.08733 58.1139C-0.222339 50.1514 13.3981 42.965 28.5701 37.4583C61.2714 25.5944 103.362 18.1423 146.239 12.7206C228.606 2.3131 316.878 -1.23755 403.155 2.36627C456.307 4.58809 509.519 9.62707 555.338 20.109C581.41 26.0728 606.777 35.279 606.999 46.8453C607.12 53.7659 597.831 60.3569 584.835 65.1939C571.839 70.0309 555.398 73.3158 538.675 76.0266C463.097 88.252 379.057 89.8891 297.011 91.3668" 
+                                stroke="currentColor" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                                class="hero-line-path"
+                            />
+                        </svg>
+                    </span>
                 </h1>
             </div>
         </div>
@@ -107,6 +126,16 @@ onMounted(async () => {
   gsap.set([splits.heroTextChars.chars], { opacity: 0, y: 50 });
   gsap.set(".btn-icon", { clipPath: "circle(0% at 50% 50%)" });
   gsap.set(".btn", { scale: 0 });
+  
+  // Set line animation initial state
+  const heroLinePath = document.querySelector('.hero-line-path');
+  if (heroLinePath) {
+    const pathLength = heroLinePath.getTotalLength();
+    gsap.set(heroLinePath, {
+      strokeDasharray: pathLength,
+      strokeDashoffset: pathLength
+    });
+  }
 
   function animateProgress(duration = 4) {
     const tl = gsap.timeline();
@@ -207,6 +236,11 @@ onMounted(async () => {
       duration: 0.6,
       ease: "power2.out",
     }, "-=2.2")
+    .to('.hero-line-path', {
+      strokeDashoffset: 0,
+      duration: 1.5,
+      ease: "power2.out",
+    }, "-=0.8")
     .to(splits.headerChars.chars, {
       y: 0,
       stagger: 0.05,

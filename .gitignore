@@ -7,6 +7,7 @@
 dist
 
 # Node dependencies
+menu
 node-compile-cache
 node_modules
 storytelling/
