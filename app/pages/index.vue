@@ -29,8 +29,8 @@
         <!-- Text Overlay -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center px-4 md:px-8 lg:px-16 mt-16 md:mt-20 lg:mt-24">
-                <h1 class="hero-text epilogue text-2xl md:text-4xl lg:text-6xl xl:text-7xl font-bold text-white drop-shadow-2xl leading-tight">
-                    Revolutionizing<br>Transportation 
+                <h1 class="hero-text epilogue text-2xl md:text-4xl lg:text-6xl xl:text-7xl font-bold epilogue text-white drop-shadow-2xl leading-tight">
+                    Revolutionizing<br>traffic <span class="lora">jam</span> analytics 
                     <span class="relative inline-block">
                         system
                         <svg 
@@ -50,6 +50,7 @@
                             />
                         </svg>
                     </span>
+                    in Astana
                 </h1>
             </div>
         </div>
