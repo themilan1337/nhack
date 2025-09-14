@@ -17,6 +17,23 @@
             preload="auto"
             class="w-full h-full object-cover rounded-2xl"
         ></video>
+        
+        <!-- Dark Overlay -->
+        <div class="absolute inset-4 bg-black/40 rounded-2xl pointer-events-none"></div>
+        
+        <!-- Logo at Top -->
+        <div class="absolute top-8 left-8 md:top-12 md:left-12 z-10 pointer-events-none">
+            <img src="/image.svg" alt="inDrive Logo" class="h-10 md:h-14 w-auto" />
+        </div>
+        
+        <!-- Text Overlay -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="text-center px-4 md:px-8 lg:px-16 mt-16 md:mt-20 lg:mt-24">
+                <h1 class="hero-text epilogue text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-2xl leading-tight">
+                    Revolutionizing<br>Transportation
+                </h1>
+            </div>
+        </div>
     </div>
     
     
@@ -71,6 +88,7 @@ onMounted(async () => {
     { key: "heroFooterH3", selector: ".hero-footer h3", type: "lines" },
     { key: "heroFooterP", selector: ".hero-footer p", type: "lines" },
     { key: "btnLabels", selector: ".btn-label span", type: "lines" },
+    { key: "heroTextChars", selector: ".hero-text", type: "chars" },
   ];
 
   const splits = createSplitTexts(splitElements);
@@ -86,6 +104,7 @@ onMounted(async () => {
     ],
     { y: "100%" }
   );
+  gsap.set([splits.heroTextChars.chars], { opacity: 0, y: 50 });
   gsap.set(".btn-icon", { clipPath: "circle(0% at 50% 50%)" });
   gsap.set(".btn", { scale: 0 });
 
@@ -178,6 +197,16 @@ onMounted(async () => {
       },
       "<"
     )
+    .to(splits.heroTextChars.chars, {
+      opacity: 1,
+      y: 0,
+      stagger: {
+        amount: 1.2,
+        from: "random"
+      },
+      duration: 0.6,
+      ease: "power2.out",
+    }, "-=2.2")
     .to(splits.headerChars.chars, {
       y: 0,
       stagger: 0.05,
