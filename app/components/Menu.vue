@@ -1,10 +1,7 @@
 <template>
   <nav class="menu-nav">
     <div class="menu-bar">
-      <div class="menu-logo">
-        <a href="#"><img src="/image.svg" alt="inDrive Logo" /></a>
-      </div>
-      <div class="menu-toggle-btn" @click="toggleMenu">
+      <div class="menu-toggle-btn" @click="toggleMenu" :class="{ 'menu-open': isMenuOpen }">
         <div class="menu-toggle-label"><p>Menu</p></div>
         <div class="menu-hamburger-icon" :class="{ active: isMenuOpen }">
           <span></span>
@@ -238,11 +235,6 @@ onUnmounted(() => {
   gap: 1rem;
 }
 
-.menu-logo {
-  width: 2rem;
-  height: 2rem;
-}
-
 .menu-toggle-btn {
   display: flex;
   align-items: center;
@@ -261,6 +253,11 @@ onUnmounted(() => {
   font-size: 0.95rem;
   font-weight: 500;
   color: white;
+  transition: color 0.3s ease;
+}
+
+.menu-toggle-btn.menu-open .menu-toggle-label p {
+  color: #333;
 }
 
 .menu-hamburger-icon {
@@ -274,6 +271,11 @@ onUnmounted(() => {
   gap: 0.3rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.menu-toggle-btn.menu-open .menu-hamburger-icon {
+  border-color: rgba(51, 51, 51, 0.3);
 }
 
 .menu-hamburger-icon span {
@@ -284,6 +286,10 @@ onUnmounted(() => {
   transition: all 0.75s cubic-bezier(0.87, 0, 0.13, 1);
   transform-origin: center;
   will-change: transform;
+}
+
+.menu-toggle-btn.menu-open .menu-hamburger-icon span {
+  background-color: #333;
 }
 
 .menu-hamburger-icon span:nth-child(1) {
