@@ -59,8 +59,11 @@
     
     <!-- Storytelling Map Section -->
     <div class="storytelling-section">
-        <StorytellingMap />
+        <div class="storytelling-wrapper">
+            <StorytellingMap />
+        </div>
     </div>
+
 </template>
 <script setup>
 import gsap from "gsap";
@@ -290,13 +293,33 @@ onMounted(async () => {
 .storytelling-section {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  margin-top: 0;
   z-index: 10;
+}
+
+.storytelling-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Ensure video section has proper z-index */
 .preloader-progress,
 .preloader-mask {
   z-index: 1000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .storytelling-section {
+    height: 100vh;
+    margin-top: 0;
+  }
+  
+  .storytelling-wrapper {
+    border-radius: 0;
+  }
 }
 </style>

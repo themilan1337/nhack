@@ -238,7 +238,8 @@ const initializeScrollama = () => {
     .setup({
       step: '.step',
       offset: 0.5,
-      progress: true
+      progress: true,
+      container: '.story-container'
     })
     .onStepEnter(async (response) => {
       const currentChapterIndex = config.value.chapters.findIndex(chap => chap.id === response.element.id)
@@ -308,21 +309,31 @@ onUnmounted(() => {
 .storytelling-container {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 .map-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   z-index: 1;
 }
 
 .story-container {
   position: relative;
   z-index: 5;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scroll-behavior: smooth;
+}
+
+.story-container::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 .header {
@@ -336,15 +347,15 @@ onUnmounted(() => {
 .header h2,
 .header p {
   margin: 0;
-  padding: 2vh 2vw;
+  padding: 0;
   text-align: center;
 }
 
 .footer {
   width: 100%;
-  min-height: 5vh;
-  padding-top: 2vh;
-  padding-bottom: 2vh;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   text-align: center;
   line-height: 25px;
   font-size: 13px;
@@ -353,14 +364,17 @@ onUnmounted(() => {
 }
 
 .features {
-  padding-top: 10vh;
-  padding-bottom: 10vh;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .step {
-  padding-bottom: 50vh;
+  padding-bottom: 0;
   opacity: 0.25;
   transition: opacity 0.3s ease;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
 .step.active {
@@ -371,13 +385,11 @@ onUnmounted(() => {
   padding: 25px 50px;
   line-height: 25px;
   font-size: 13px;
-  border-radius: 8px;
   backdrop-filter: blur(10px);
 }
 
 .chapter-content img {
   width: 100%;
-  border-radius: 4px;
 }
 
 .hidden {
@@ -426,6 +438,16 @@ onUnmounted(() => {
   .chapter-content {
     padding: 20px 25px;
     font-size: 12px;
+  }
+  
+  .step {
+    padding-bottom: 0;
+    min-height: 100vh;
+  }
+  
+  .features {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 
