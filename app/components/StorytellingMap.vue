@@ -137,10 +137,10 @@ const storytellingConfig = {
       image: '/2.webp',
       description: 'Join us as we continue to innovate and expand, creating a more connected and accessible world through smart transportation solutions. <br><br><a href="#contact" style="color: #00d4aa; font-weight: bold;">Get Started Today →</a>',
       location: {
-        center: [71.42, 51.0889],
-        zoom: 2,
+        center: [71.41611111, 51.09027778],
+        zoom: 14,
         pitch: 0,
-        bearing: 0
+        bearing: 90
       },
       alignment: 'center',
       onChapterEnter: [],
