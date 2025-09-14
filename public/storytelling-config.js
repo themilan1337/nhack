@@ -7,7 +7,6 @@ export const storytellingConfig = {
   alignment: 'left',
   title: 'inDrive Journey',
   subtitle: 'Discover the story behind our innovative transportation platform',
-  footer: 'Experience the future of ride-sharing with inDrive',
   chapters: [
     {
       id: 'intro-chapter',
