@@ -20,12 +20,26 @@
 </template>
 <script setup>
 import gsap from "gsap";
-import { SplitText } from "gsap/SplitText";
 import { onMounted } from "vue";
 
-gsap.registerPlugin(SplitText);
+let SplitText;
 
-onMounted(() => {
+// Dynamically import and register SplitText plugin only on client-side
+if (process.client) {
+  import('gsap/SplitText').then((module) => {
+    SplitText = module.SplitText;
+    gsap.registerPlugin(SplitText);
+  });
+}
+
+onMounted(async () => {
+  // Wait for SplitText to be loaded
+  if (process.client && !SplitText) {
+    const module = await import('gsap/SplitText');
+    SplitText = module.SplitText;
+    gsap.registerPlugin(SplitText);
+  }
+
   if (typeof document !== 'undefined' && document.fonts) {
     document.fonts.ready.then(() => {
   function createSplitTexts(elements) {

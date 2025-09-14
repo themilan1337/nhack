@@ -12,5 +12,13 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
+  },
+  build: {
+    transpile: ['gsap']
+  },
+  nitro: {
+    experimental: {
+      wasm: true
+    }
   }
 })
