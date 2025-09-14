@@ -1,10 +1,10 @@
 <template>
-    <div class="preloader-progress">
+    <div class="preloader-progress z-[99919]">
       <div class="preloader-progress-bar"></div>
       <div class="preloader-logo"><h1>inDrive</h1></div>
     </div>
 
-    <div class="preloader-mask"></div>
+    <div class="preloader-mask z-[99199]"></div>
 
     <!-- Hero Video Section -->
     <div class="relative w-full h-screen !p-4 max-h-screen min-h-screen z-[999] bg-white">
