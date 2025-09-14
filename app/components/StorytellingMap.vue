@@ -5,12 +5,6 @@
     
     <!-- Story Content -->
     <div id="story" class="story-container">
-      <!-- Header -->
-      <div v-if="config.title || config.subtitle" id="header" :class="config.theme" class="header m-4">
-        <h1 class="font-bold text-sm" v-if="config.title">{{ config.title }}</h1>
-        <h2 v-if="config.subtitle">{{ config.subtitle }}</h2>
-      </div>
-      
       <!-- Features/Chapters -->
       <div id="features" class="features">
         <div
@@ -24,17 +18,25 @@
             { 'hidden': chapter.hidden }
           ]"
         >
-          <div :class="config.theme" class="chapter-content">
-            <h3 v-if="chapter.title">{{ chapter.title }}</h3>
-            <img v-if="chapter.image" :src="chapter.image" alt="Chapter image" />
-            <p v-if="chapter.description" v-html="chapter.description"></p>
+          <div class="chapter-card px-4">
+            <div class="story-card">
+              <img v-if="chapter.image" :src="chapter.image" alt="Chapter image" class="card-image" />
+              <div class="card-content">
+                <h3 v-if="chapter.title" class="card-title">{{ chapter.title }}</h3>
+                <p v-if="chapter.description" class="card-description" v-html="chapter.description"></p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
-      <!-- Footer -->
-      <div v-if="config.footer" id="footer" :class="config.theme" class="footer">
-        <p v-html="config.footer"></p>
+      <!-- Footer Card -->
+      <div v-if="config.footer" id="footer" class="footer-card px-4 mt-8">
+        <div class="story-card">
+          <div class="card-content">
+            <p class="card-description" v-html="config.footer"></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -336,29 +338,67 @@ onUnmounted(() => {
   display: none; /* WebKit */
 }
 
-.header {
-  margin: auto;
+/* Card Styles */
+.story-card {
+  background: #fff;
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 32px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #C0F11C, #A8E010);
+  border-radius: 24px 24px 0 0;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.card-title {
+  font-family: 'Epilogue', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.card-description {
+  font-family: 'Epilogue', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #4a4a4a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.card-image {
   width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.header-card,
+.footer-card {
   position: relative;
   z-index: 5;
-}
-
-.header h1,
-.header h2,
-.header p {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.footer {
   width: 100%;
-  min-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  text-align: center;
-  line-height: 25px;
-  font-size: 13px;
+}
+
+.chapter-card {
   position: relative;
   z-index: 5;
 }
@@ -381,16 +421,7 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
-.chapter-content {
-  padding: 25px 50px;
-  line-height: 25px;
-  font-size: 13px;
-  backdrop-filter: blur(10px);
-}
 
-.chapter-content img {
-  width: 100%;
-}
 
 .hidden {
   visibility: hidden;
@@ -416,10 +447,7 @@ onUnmounted(() => {
   margin: auto;
 }
 
-.light {
-  color: #444;
-  background-color: rgba(250, 250, 250, 0.9);
-}
+
 
 @media (max-width: 750px) {
   .centered,
@@ -430,9 +458,25 @@ onUnmounted(() => {
     margin: 0 auto;
   }
   
-  .chapter-content {
-    padding: 20px 25px;
-    font-size: 12px;
+  .story-card {
+    padding: 24px;
+    border-radius: 20px;
+  }
+  
+  .card-title {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .card-description {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .card-image {
+    height: 160px;
+    margin-bottom: 20px;
+    border-radius: 12px;
   }
   
   .step {
