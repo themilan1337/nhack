@@ -17,17 +17,17 @@
         <div class="menu-content-wrapper">
           <div class="menu-content-main">
             <div class="menu-col">
-              <div class="menu-link"><a href="#">Home</a></div>
-              <div class="menu-link"><a href="#">About</a></div>
-              <div class="menu-link"><a href="#">Services</a></div>
-              <div class="menu-link"><a href="#">Contact</a></div>
-              <div class="menu-link"><a href="#">Careers</a></div>
+              <div class="menu-link hover:underline"><a href="#">Home</a></div>
+              <div class="menu-link hover:underline"><a href="#">About</a></div>
+              <div class="menu-link hover:underline"><a href="#">Services</a></div>
+              <div class="menu-link hover:underline"><a href="#">Contact</a></div>
+              <div class="menu-link hover:underline"><a href="#">Careers</a></div>
             </div>
 
             <div class="menu-col">
-              <div class="menu-tag"><a href="#">Transportation</a></div>
-              <div class="menu-tag"><a href="#">Technology</a></div>
-              <div class="menu-tag"><a href="#">Innovation</a></div>
+              <div class="menu-tag hover:underline"><a href="#">Transportation</a></div>
+              <div class="menu-tag hover:underline"><a href="#">Technology</a></div>
+              <div class="menu-tag hover:underline"><a href="#">Innovation</a></div>
             </div>
           </div>
           <div class="menu-footer">
@@ -343,7 +343,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.25;
 }
 
 .menu-content-wrapper {
