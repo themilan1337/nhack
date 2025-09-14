@@ -1,16 +1,3 @@
-<!-- 
-
-
-.hero-video-section {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  padding: 1rem;
-  z-index: 100;
-  background: #fff;
-}
-
--->
 <template>
     <div class="preloader-progress">
       <div class="preloader-progress-bar"></div>
