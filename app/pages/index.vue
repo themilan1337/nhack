@@ -59,6 +59,8 @@
         </div>
     </div>
     
+    <!-- Stats Section -->
+    <StatsSection />
     
     <!-- Storytelling Map Section -->
     <div class="storytelling-section">
@@ -72,6 +74,7 @@
 import gsap from "gsap";
 import { onMounted } from "vue";
 import StorytellingMap from "~/components/StorytellingMap.vue";
+import StatsSection from "~/components/StatsSection.vue";
 import Menu from "~/components/Menu.vue";
 
 let SplitText;
