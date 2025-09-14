@@ -69,11 +69,17 @@
         </div>
     </div>
 
+    <!-- Traffic Map Section -->
+    <div class="traffic-map-section">
+        <TrafficMap />
+    </div>
+
 </template>
 <script setup>
 import gsap from "gsap";
 import { onMounted } from "vue";
 import StorytellingMap from "~/components/StorytellingMap.vue";
+import TrafficMap from "~/components/TrafficMap.vue";
 import StatsSection from "~/components/StatsSection.vue";
 import Menu from "~/components/Menu.vue";
 
@@ -310,6 +316,26 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+.traffic-map-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  z-index: 5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove any default body margins/padding that might cause gaps */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure no gaps at the bottom */
+html, body {
+  overflow-x: hidden;
 }
 
 /* Ensure video section has proper z-index */
