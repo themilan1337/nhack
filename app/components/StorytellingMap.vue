@@ -62,7 +62,7 @@ const storytellingConfig = {
       image: '/1.webp',
       description: 'inDrive is revolutionizing transportation by putting passengers and drivers in control. Our platform allows you to negotiate fair prices and choose your preferred driver. <br><br><strong>Scroll down to explore our journey</strong>',
       location: {
-        center: [71.43055556, 51.12833333],
+        center: [71.41583333, 51.09500000],
         zoom: 15,
         pitch: 30,
         bearing: 0
@@ -92,7 +92,7 @@ const storytellingConfig = {
       image: '/3.webp',
       description: 'Our advanced algorithms ensure optimal matching between passengers and drivers, while maintaining transparency and fairness in pricing. Real-time tracking and secure payments make every journey safe and reliable.',
       location: {
-        center: [71.40389, 51.13222],
+        center: [71.41222, 51.08528],
         zoom: 16,
         pitch: 60,
         bearing: 45
