@@ -1,5 +1,4 @@
 <template>
-    <!-- Menu Component -->
     <Menu />
     
     <div class="preloader-progress">
@@ -9,7 +8,6 @@
 
     <div class="preloader-mask"></div>
 
-    <!-- Hero Video Section -->
     <div class="relative w-full h-screen max-h-screen !p-4 bg-white z-[100]">
         <video 
             src="/assets/hero.mp4"
@@ -24,12 +22,10 @@
     
         <div class="absolute inset-4 bg-black/70 rounded-2xl pointer-events-none"></div>
         
-        <!-- Logo at Top -->
         <div class="absolute top-8 left-8 md:top-12 md:left-12 z-10 pointer-events-none">
             <img src="/image.svg" alt="inDrive Logo" class="h-10 md:h-14 w-auto" />
         </div>
         
-        <!-- Text Overlay -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center px-4 md:px-8 lg:px-16 mt-16 md:mt-20 lg:mt-24">
                 <h1 class="hero-text text-2xl md:text-4xl lg:text-6xl xl:text-7xl font-bold text-white drop-shadow-2xl leading-tight">
@@ -59,15 +55,12 @@
         </div>
     </div>
     
-    <!-- Traffic Map Section -->
     <div class="traffic-map-section">
         <TrafficMap />
     </div>
     
-    <!-- Stats Section -->
     <StatsSection />
     
-    <!-- Storytelling Map Section -->
     <div class="storytelling-section">
         <div class="storytelling-wrapper">
             <StorytellingMap />
@@ -85,7 +78,6 @@ import Menu from "~/components/Menu.vue";
 
 let SplitText;
 
-// Dynamically import and register SplitText plugin only on client-side
 if (process.client) {
   import('gsap/SplitText').then((module) => {
     SplitText = module.SplitText;
@@ -94,7 +86,6 @@ if (process.client) {
 }
 
 onMounted(async () => {
-  // Wait for SplitText to be loaded
   if (process.client && !SplitText) {
     const module = await import('gsap/SplitText');
     SplitText = module.SplitText;
@@ -144,7 +135,6 @@ onMounted(async () => {
   gsap.set(".btn-icon", { clipPath: "circle(0% at 50% 50%)" });
   gsap.set(".btn", { scale: 0 });
   
-  // Set line animation initial state
   const heroLinePath = document.querySelector('.hero-line-path');
   if (heroLinePath) {
     const pathLength = heroLinePath.getTotalLength();
@@ -327,24 +317,20 @@ onMounted(async () => {
   padding: 0;
 }
 
-/* Remove any default body margins/padding that might cause gaps */
 body {
   margin: 0;
   padding: 0;
 }
 
-/* Ensure no gaps at the bottom */
 html, body {
   overflow-x: hidden;
 }
 
-/* Ensure video section has proper z-index */
 .preloader-progress,
 .preloader-mask {
   z-index: 1000;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .storytelling-section {
     height: 100vh;
