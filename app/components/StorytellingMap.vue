@@ -57,10 +57,10 @@ const storytellingConfig = {
   subtitle: 'Discover the story behind our innovative transportation platform',
   chapters: [
     {
-      id: 'intro-chapter',
-      title: 'Welcome to inDrive',
+      id: 'trajectory-analysis',
+      title: 'Trajectory Analysis',
       image: '/1.webp',
-      description: 'inDrive is revolutionizing transportation by putting passengers and drivers in control. Our platform allows you to negotiate fair prices and choose your preferred driver. <br><br><strong>Scroll down to explore our journey</strong>',
+      description: 'We analyzed 1,262,687 records from 6,805 vehicles. Average number of points per vehicle is 185, maximum 5,909. <br><br><strong>Examples:</strong><br>Car 1: 316 points, average speed 13.9 km/h, distance 342.7 km<br>Car 2: 263 points, average speed 7.56 km/h, distance 161.5 km',
       location: {
         center: [71.41583333, 51.09500000],
         zoom: 15,
@@ -72,10 +72,10 @@ const storytellingConfig = {
       onChapterExit: []
     },
     {
-      id: 'city-overview',
-      title: 'Connecting Cities Worldwide',
+      id: 'map-segmentation',
+      title: 'Map Segmentation',
       image: '/2.webp',
-      description: 'From bustling metropolises to growing urban centers, inDrive connects communities worldwide. Our platform adapts to local needs and preferences, ensuring every ride is tailored to your requirements.',
+      description: 'The map is divided into cells of 10-20 meters. For each cell we store: ID, center coordinates, latitude and longitude boundaries. This allows us to analyze movement with precision down to specific road sections.',
       location: {
         center: [71.42, 51.0889],
         zoom: 14,
@@ -87,10 +87,10 @@ const storytellingConfig = {
       onChapterExit: []
     },
     {
-      id: 'technology-focus',
-      title: 'Smart Technology at Work',
+      id: 'congestion-algorithm',
+      title: 'Congestion Calculation Algorithm',
       image: '/3.webp',
-      description: 'Our advanced algorithms ensure optimal matching between passengers and drivers, while maintaining transparency and fairness in pricing. Real-time tracking and secure payments make every journey safe and reliable.',
+      description: 'We use the 90th percentile of speeds as base speed:<br><code>base_speed = np.percentile(speeds[speeds > 0], 90)</code><br><br>Then calculate congestion coefficient:<br><code>congestion = (base_speed - avg_speed) / base_speed</code><br><br>Result: number from 0 (free flow) to 1 (almost stopped).',
       location: {
         center: [71.41222, 51.08528],
         zoom: 16,
@@ -102,10 +102,10 @@ const storytellingConfig = {
       onChapterExit: []
     },
     {
-      id: 'community-impact',
-      title: 'Empowering Communities',
+      id: 'special-cases',
+      title: 'Handling Special Cases',
       image: '/4.webp',
-      description: 'inDrive empowers local communities by providing economic opportunities for drivers and affordable transportation for passengers. We believe in fair pricing that benefits everyone in the ecosystem.',
+      description: 'If base speed < 15 km/h (courtyards, parking lots) → set minimum congestion 0.1<br><br>If points < 5 → cell is excluded from analysis<br><br>This ensures data quality and meaningful results.',
       location: {
         center: [71.41280555555556, 51.09125],
         zoom: 14,
@@ -117,10 +117,10 @@ const storytellingConfig = {
       onChapterExit: []
     },
     {
-      id: 'global-expansion',
-      title: 'Global Reach, Local Impact',
+      id: 'additional-metrics',
+      title: 'Additional Metrics',
       image: '/1.webp',
-      description: 'Operating in over 600 cities across 47 countries, inDrive has become a trusted transportation partner worldwide. Each market brings unique challenges and opportunities.',
+      description: 'Speed variation coefficient = movement stability<br><br>Point density = statistical reliability<br>More data = more accurate prediction.<br><br>These metrics help validate our congestion analysis.',
       location: {
         center: [71.41583333333333, 51.08083333333333],
         zoom: 13,
@@ -132,13 +132,13 @@ const storytellingConfig = {
       onChapterExit: []
     },
     {
-      id: 'future-vision',
-      title: 'The Future of Mobility',
+      id: 'visualization-results',
+      title: 'Visualization and Results',
       image: '/2.webp',
-      description: 'Join us as we continue to innovate and expand, creating a more connected and accessible world through smart transportation solutions. <br><br><a href="#contact" style="color: #00d4aa; font-weight: bold;">Get Started Today →</a>',
+      description: 'We build an interactive map:<br><br><span style="color: #00aa00;">■</span> Green — free flow (0.0–0.3)<br><span style="color: #ffaa00;">■</span> Yellow — moderate congestion (0.3–0.6)<br><span style="color: #ff0000;">■</span> Red — heavy congestion (0.6–1.0)<br><br>Also includes speed map — from blue (slow) to red (fast).',
       location: {
-        center: [71.41611111, 51.09027778],
-        zoom: 2,
+        center: [71.41583333, 51.09555556],
+        zoom: 15,
         pitch: 0,
         bearing: 90
       },
